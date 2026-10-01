@@ -1,43 +1,65 @@
 #include "core/engine_host.hpp"
 
-#include <exception>
+#include <utility>
 
 namespace okkhor_windows
 {
 
-    EngineHost::EngineHost() = default;
+    EngineHost::EngineHost()
+        : engine_(odri_engine_new())
+    {
+    }
 
-    EngineHost::~EngineHost() = default;
+    EngineHost::~EngineHost()
+    {
+        if (engine_)
+        {
+            odri_engine_free(engine_);
+        }
+    }
 
-    EngineHost::EngineHost(EngineHost &&) noexcept = default;
+    EngineHost::EngineHost(EngineHost &&other) noexcept
+        : engine_(std::exchange(other.engine_, nullptr))
+    {
+    }
 
-    EngineHost &EngineHost::operator=(EngineHost &&) noexcept = default;
+    EngineHost &EngineHost::operator=(EngineHost &&other) noexcept
+    {
+        if (this != &other)
+        {
+            if (engine_)
+            {
+                odri_engine_free(engine_);
+            }
+
+            engine_ = std::exchange(other.engine_, nullptr);
+        }
+
+        return *this;
+    }
 
     bool EngineHost::Transliterate(
         std::string_view latin_utf8,
         std::string *out) const
     {
-        if (!out)
+        if (!out || !engine_)
         {
             return false;
         }
 
-        try
-        {
-            *out =
-                engine_.transliterate_latin_to_bangla(
-                    latin_utf8);
+        char *result = odri_engine_convert(
+            engine_,
+            latin_utf8.data());
 
-            return true;
-        }
-        catch (const std::exception &)
+        if (!result)
         {
             return false;
         }
-        catch (...)
-        {
-            return false;
-        }
+
+        *out = result;
+
+        odri_string_free(result);
+
+        return true;
     }
-
 } // namespace okkhor_windows

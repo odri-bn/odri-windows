@@ -1,8 +1,7 @@
 #pragma once
 
-#include <okkhor/okkhor.hpp>
+#include <odri/odri.h>
 
-#include <cstddef>
 #include <string>
 #include <string_view>
 
@@ -15,18 +14,18 @@ namespace okkhor_windows
         EngineHost();
         ~EngineHost();
 
-        EngineHost(const EngineHost &) = delete;
-        EngineHost &operator=(const EngineHost &) = delete;
-
         EngineHost(EngineHost &&) noexcept;
         EngineHost &operator=(EngineHost &&) noexcept;
+
+        EngineHost(const EngineHost &) = delete;
+        EngineHost &operator=(const EngineHost &) = delete;
 
         bool Transliterate(
             std::string_view latin_utf8,
             std::string *out) const;
 
     private:
-        okkhor::Engine engine_;
+        OdriEngine *engine_ = nullptr;
     };
 
 } // namespace okkhor_windows
