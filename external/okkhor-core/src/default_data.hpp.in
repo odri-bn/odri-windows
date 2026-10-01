@@ -1,0 +1,25 @@
+#pragma once
+
+namespace okkhor::default_data {
+
+inline constexpr const char* vowels = R"OK_VOW(
+@OKKHOR_VOWELS_JSON@
+)OK_VOW";
+
+inline constexpr const char* consonants = R"OK_CON(
+@OKKHOR_CONSONANTS_JSON@
+)OK_CON";
+
+inline constexpr const char* controls = R"OK_CTL(
+@OKKHOR_CONTROLS_JSON@
+)OK_CTL";
+
+inline constexpr const char* punctuation = R"OK_PUN(
+@OKKHOR_PUNCTUATION_JSON@
+)OK_PUN";
+
+inline constexpr const char* rules = R"OK_RUL(
+@OKKHOR_RULES_JSON@
+)OK_RUL";
+
+}
