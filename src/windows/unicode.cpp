@@ -3,7 +3,7 @@
 
 #include <windows.h>
 
-namespace okkhor_windows {
+namespace odri_windows {
 
 std::wstring Utf8ToWide(const std::string& utf8) {
     if (utf8.empty()) return {};
@@ -35,4 +35,4 @@ std::string WideToUtf8(const std::wstring& wide) {
     return utf8;
 }
 
-}  // namespace okkhor_windows
+}  // namespace odri_windows

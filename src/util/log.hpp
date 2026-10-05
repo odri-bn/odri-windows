@@ -5,16 +5,16 @@
 // the only practical way to see what TSF is doing.
 //
 // The log is written to:
-//     %LOCALAPPDATA%\Okkhor\okkhor-windows.log
+//     %LOCALAPPDATA%\Odri\odri-windows.log
 //
-// Logging is compiled in only when OKKHOR_WINDOWS_LOGGING is defined (the CMake
-// option OKKHOR_WINDOWS_ENABLE_LOGGING, ON for Debug builds). In release builds
+// Logging is compiled in only when ODRI_WINDOWS_LOGGING is defined (the CMake
+// option ODRI_WINDOWS_ENABLE_LOGGING, ON for Debug builds). In release builds
 // the macros expand to nothing, so no host application text can ever reach disk.
 #pragma once
 
 #include <string>
 
-namespace okkhor_windows::log {
+namespace odri_windows::log {
 
 enum class Level { Debug, Info, Warn, Error };
 
@@ -29,18 +29,18 @@ void Write(Level level, const std::wstring& message);
 // disable independently of ordinary event logging.
 void WriteComposition(const char* label, const std::string& utf8_text);
 
-}  // namespace okkhor_windows::log
+}  // namespace odri_windows::log
 
-#ifdef OKKHOR_WINDOWS_LOGGING
-#define OKKHOR_LOG_DEBUG(msg) ::okkhor_windows::log::Write(::okkhor_windows::log::Level::Debug, msg)
-#define OKKHOR_LOG_INFO(msg) ::okkhor_windows::log::Write(::okkhor_windows::log::Level::Info, msg)
-#define OKKHOR_LOG_WARN(msg) ::okkhor_windows::log::Write(::okkhor_windows::log::Level::Warn, msg)
-#define OKKHOR_LOG_ERROR(msg) ::okkhor_windows::log::Write(::okkhor_windows::log::Level::Error, msg)
-#define OKKHOR_LOG_TEXT(label, utf8) ::okkhor_windows::log::WriteComposition(label, utf8)
+#ifdef ODRI_WINDOWS_LOGGING
+#define ODRI_LOG_DEBUG(msg) ::odri_windows::log::Write(::odri_windows::log::Level::Debug, msg)
+#define ODRI_LOG_INFO(msg) ::odri_windows::log::Write(::odri_windows::log::Level::Info, msg)
+#define ODRI_LOG_WARN(msg) ::odri_windows::log::Write(::odri_windows::log::Level::Warn, msg)
+#define ODRI_LOG_ERROR(msg) ::odri_windows::log::Write(::odri_windows::log::Level::Error, msg)
+#define ODRI_LOG_TEXT(label, utf8) ::odri_windows::log::WriteComposition(label, utf8)
 #else
-#define OKKHOR_LOG_DEBUG(msg) ((void)0)
-#define OKKHOR_LOG_INFO(msg) ((void)0)
-#define OKKHOR_LOG_WARN(msg) ((void)0)
-#define OKKHOR_LOG_ERROR(msg) ((void)0)
-#define OKKHOR_LOG_TEXT(label, utf8) ((void)0)
+#define ODRI_LOG_DEBUG(msg) ((void)0)
+#define ODRI_LOG_INFO(msg) ((void)0)
+#define ODRI_LOG_WARN(msg) ((void)0)
+#define ODRI_LOG_ERROR(msg) ((void)0)
+#define ODRI_LOG_TEXT(label, utf8) ((void)0)
 #endif

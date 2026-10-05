@@ -1,6 +1,6 @@
 # scripts/common.ps1
 #
-# Shared helpers for the Okkhor installer/dev/release scripts.
+# Shared helpers for the Odri installer/dev/release scripts.
 #
 # Dot-source this file; it does nothing if run directly:
 #
@@ -12,11 +12,11 @@
 # from disk (the repo, or the installed {app} folder) and can safely use
 # this module.
 
-$OkkhorGitHubOwner = 'okkhor-bn'
-$OkkhorGitHubRepo  = 'okkhor-windows'
-$OkkhorDllName     = 'okkhor_tsf.dll'
-$OkkhorInstallDir  = Join-Path $env:ProgramFiles 'Okkhor'
-$OkkhorRegsvr32    = Join-Path $env:WINDIR 'System32\regsvr32.exe'
+$OdriGitHubOwner = 'odri-bn'
+$OdriGitHubRepo  = 'odri-windows'
+$OdriDllName     = 'odri_tsf.dll'
+$OdriInstallDir  = Join-Path $env:ProgramFiles 'Odri'
+$OdriRegsvr32    = Join-Path $env:WINDIR 'System32\regsvr32.exe'
 
 function Write-Step {
     param([string]$Message)
@@ -36,11 +36,11 @@ function Assert-Administrator {
     }
 }
 
-function Get-OkkhorProcesses {
-    # Returns the processes that currently have okkhor_tsf.dll loaded, as
+function Get-OdriProcesses {
+    # Returns the processes that currently have odri_tsf.dll loaded, as
     # {Name, Id} objects taken straight from tasklist (no extra Get-Process
     # name lookup needed - tasklist already gives us the PID).
-    $output = tasklist /m $OkkhorDllName 2>$null
+    $output = tasklist /m $OdriDllName 2>$null
     $result = @()
     foreach ($line in $output) {
         if ($line -match '^\s*(\S+)\s+(\d+)\s+') {
@@ -53,9 +53,9 @@ function Get-OkkhorProcesses {
     return $result
 }
 
-function Stop-OkkhorProcesses {
-    # Stops every process that currently has okkhor_tsf.dll loaded.
-    $procs = @(Get-OkkhorProcesses)
+function Stop-OdriProcesses {
+    # Stops every process that currently has odri_tsf.dll loaded.
+    $procs = @(Get-OdriProcesses)
     foreach ($proc in $procs) {
         Write-Host "  Stopping $($proc.Name) (PID $($proc.Id))..."
         try {
@@ -70,11 +70,11 @@ function Stop-OkkhorProcesses {
     }
 }
 
-function Unregister-OkkhorDll {
+function Unregister-OdriDll {
     param([string]$DllPath)
     if (Test-Path -LiteralPath $DllPath) {
         Write-Host "Unregistering $DllPath..."
-        & $OkkhorRegsvr32 /u /s $DllPath
+        & $OdriRegsvr32 /u /s $DllPath
         if ($LASTEXITCODE -ne 0) {
             Write-Warning "regsvr32 /u returned exit code $LASTEXITCODE."
         }
@@ -87,7 +87,7 @@ function Unregister-OkkhorDll {
     }
 }
 
-function Register-OkkhorDll {
+function Register-OdriDll {
     param([string]$DllPath)
 
     if (-not (Test-Path -LiteralPath $DllPath -PathType Leaf)) {

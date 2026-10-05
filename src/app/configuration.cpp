@@ -9,14 +9,14 @@
 
 #include "windows/module.hpp"
 
-namespace okkhor_windows {
+namespace odri_windows {
 
 // {6D27EED4-8B19-4F29-9046-720F559941E9}
-const CLSID kOkkhorTextServiceClsid = {
+const CLSID kOdriTextServiceClsid = {
     0x6d27eed4, 0x8b19, 0x4f29, {0x90, 0x46, 0x72, 0x0f, 0x55, 0x99, 0x41, 0xe9}};
 
 // {DB2F1C82-2B00-4DCF-B81C-90CF10527D6D}
-const GUID kOkkhorProfileGuid = {
+const GUID kOdriProfileGuid = {
     0xdb2f1c82, 0x2b00, 0x4dcf, {0xb8, 0x1c, 0x90, 0xcf, 0x10, 0x52, 0x7d, 0x6d}};
 
 namespace {
@@ -32,7 +32,7 @@ bool LooksLikeDataDir(const std::wstring& dir) {
 
 std::wstring ReadRegistryOverride() {
     HKEY key = nullptr;
-    if (::RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Okkhor", 0, KEY_READ, &key) != ERROR_SUCCESS)
+    if (::RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Odri", 0, KEY_READ, &key) != ERROR_SUCCESS)
         return {};
     std::wstring value;
     DWORD type = 0;
@@ -50,10 +50,10 @@ std::wstring ReadRegistryOverride() {
 }
 
 std::wstring ReadEnvironmentOverride() {
-    DWORD needed = ::GetEnvironmentVariableW(L"OKKHOR_DATA", nullptr, 0);
+    DWORD needed = ::GetEnvironmentVariableW(L"ODRI_DATA", nullptr, 0);
     if (needed == 0) return {};
     std::wstring value(needed, L'\0');
-    DWORD written = ::GetEnvironmentVariableW(L"OKKHOR_DATA", value.data(), needed);
+    DWORD written = ::GetEnvironmentVariableW(L"ODRI_DATA", value.data(), needed);
     value.resize(written);
     return value;
 }
@@ -89,4 +89,4 @@ std::wstring ResolveDataDirectory() {
     return {};
 }
 
-}  // namespace okkhor_windows
+}  // namespace odri_windows

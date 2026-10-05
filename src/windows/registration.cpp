@@ -14,7 +14,7 @@
 
 using Microsoft::WRL::ComPtr;
 
-namespace okkhor_windows
+namespace odri_windows
 {
     namespace
     {
@@ -26,7 +26,7 @@ namespace okkhor_windows
             return buffer;
         }
 
-        std::wstring ClsidKeyPath() { return L"CLSID\\" + GuidToString(kOkkhorTextServiceClsid); }
+        std::wstring ClsidKeyPath() { return L"CLSID\\" + GuidToString(kOdriTextServiceClsid); }
 
         LONG SetStringValue(HKEY key, const wchar_t *name, const std::wstring &value)
         {
@@ -108,12 +108,12 @@ namespace okkhor_windows
         // HKL 0x00000409 corresponds to standard US QWERTY keyboard layout.
         // Specifying this as hklSubstitute ensures that any unhandled key (where *pfEaten = FALSE)
         // falls back to the physical US QWERTY key map rather than Bijoy/Jatiya.
-        const HKL hkl_us_qwerty = reinterpret_cast<HKL>(static_cast<UINT_PTR>(kOkkhorSubstituteHkl));
+        const HKL hkl_us_qwerty = reinterpret_cast<HKL>(static_cast<UINT_PTR>(kOdriSubstituteHkl));
 
         hr = profile_mgr->RegisterProfile(
-            kOkkhorTextServiceClsid,
-            kOkkhorLangId, // 0x0445 (Bangla) or 0x0409 (English)
-            kOkkhorProfileGuid,
+            kOdriTextServiceClsid,
+            kOdriLangId, // 0x0445 (Bangla) or 0x0409 (English)
+            kOdriProfileGuid,
             kProfileDescription,
             static_cast<ULONG>(wcslen(kProfileDescription)),
             module_path.c_str(),
@@ -135,7 +135,7 @@ namespace okkhor_windows
             return hr;
 
         // Unregister removes the profiles belonging to the CLSID as well.
-        return profiles->Unregister(kOkkhorTextServiceClsid);
+        return profiles->Unregister(kOdriTextServiceClsid);
     }
 
     HRESULT RegisterCategories()
@@ -148,8 +148,8 @@ namespace okkhor_windows
 
         for (const GUID *category : kCategories)
         {
-            hr = category_mgr->RegisterCategory(kOkkhorTextServiceClsid, *category,
-                                                kOkkhorTextServiceClsid);
+            hr = category_mgr->RegisterCategory(kOdriTextServiceClsid, *category,
+                                                kOdriTextServiceClsid);
             if (FAILED(hr))
                 return hr;
         }
@@ -165,9 +165,9 @@ namespace okkhor_windows
             return hr;
 
         for (const GUID *category : kCategories)
-            category_mgr->UnregisterCategory(kOkkhorTextServiceClsid, *category,
-                                             kOkkhorTextServiceClsid);
+            category_mgr->UnregisterCategory(kOdriTextServiceClsid, *category,
+                                             kOdriTextServiceClsid);
         return S_OK;
     }
 
-} // namespace okkhor_windows
+} // namespace odri_windows

@@ -8,7 +8,7 @@
 
 #include <string>
 
-namespace okkhor_windows {
+namespace odri_windows {
 
 void SetModuleHandle(HMODULE module);
 HMODULE GetOwnModuleHandle();
@@ -32,4 +32,4 @@ public:
     ModuleLock& operator=(const ModuleLock&) = delete;
 };
 
-}  // namespace okkhor_windows
+}  // namespace odri_windows

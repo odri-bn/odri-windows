@@ -8,7 +8,7 @@
 # To unregister a specific DLL (e.g. a Release build) instead of the
 # default Debug one:
 #
-#   powershell -ExecutionPolicy Bypass -File scripts\dev-clean.ps1 -Dll "build\Release\okkhor_tsf.dll"
+#   powershell -ExecutionPolicy Bypass -File scripts\dev-clean.ps1 -Dll "build\Release\odri_tsf.dll"
 #
 # To unregister without deleting the build directory:
 #
@@ -31,18 +31,18 @@ if ($Dll) {
     $dllPath = (Resolve-Path -LiteralPath $Dll -ErrorAction Stop).Path
 }
 else {
-    $dllPath = Join-Path $buildDir 'Debug\okkhor_tsf.dll'
+    $dllPath = Join-Path $buildDir 'Debug\odri_tsf.dll'
 }
 
 Write-Host ''
-Write-Host '=== Okkhor dev clean ===' -ForegroundColor Cyan
+Write-Host '=== Odri dev clean ===' -ForegroundColor Cyan
 Write-Host ''
 
 Write-Step 'Stopping Windows components...'
-Stop-OkkhorProcesses
+Stop-OdriProcesses
 
-Write-Step 'Unregistering Okkhor...'
-Unregister-OkkhorDll -DllPath $dllPath
+Write-Step 'Unregistering Odri...'
+Unregister-OdriDll -DllPath $dllPath
 
 if (-not $KeepBuildDir) {
     if (Test-Path -LiteralPath $buildDir) {
@@ -59,5 +59,5 @@ else {
 }
 
 Write-Host ''
-Write-Host '=== Okkhor dev clean complete ===' -ForegroundColor Green
+Write-Host '=== Odri dev clean complete ===' -ForegroundColor Green
 Write-Host ''

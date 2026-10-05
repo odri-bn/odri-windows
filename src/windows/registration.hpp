@@ -1,6 +1,6 @@
 // src/windows/registration.hpp
 //
-// Everything Windows needs to know about Okkhor before it will offer it as an
+// Everything Windows needs to know about Odri before it will offer it as an
 // input method. Three separate things must be registered, and all three are
 // undone on uninstall:
 //
@@ -14,7 +14,7 @@
 
 #include <windows.h>
 
-namespace okkhor_windows {
+namespace odri_windows {
 
 // HKCR\CLSID\{clsid}, pointing at this DLL, ThreadingModel = Apartment.
 HRESULT RegisterComServer();
@@ -30,4 +30,4 @@ HRESULT UnregisterProfile();
 HRESULT RegisterCategories();
 HRESULT UnregisterCategories();
 
-}  // namespace okkhor_windows
+}  // namespace odri_windows

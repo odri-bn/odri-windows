@@ -39,7 +39,7 @@ namespace
 
 int main()
 {
-    using okkhor_windows::EngineHost;
+    using odri_windows::EngineHost;
 
     EngineHost engine;
 

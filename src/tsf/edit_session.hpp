@@ -3,10 +3,10 @@
 #include <msctf.h>
 #include <wrl/client.h>
 
-namespace okkhor_windows
+namespace odri_windows
 {
 
-class OkkhorTextService;
+class OdriTextService;
 
 enum class CompositionEditOperation
 {
@@ -21,10 +21,11 @@ class CompositionEditSession
 {
 public:
 
-    CompositionEditSession(
-        OkkhorTextService* service,
-        ITfContext* context,
-        CompositionEditOperation operation);
+CompositionEditSession(
+    OdriTextService* service,
+    ITfContext* context,
+    CompositionEditOperation operation,
+    char latin);
 
     STDMETHODIMP QueryInterface(
         REFIID riid,
@@ -43,11 +44,12 @@ private:
 
     LONG ref_count_ = 1;
 
-    OkkhorTextService* service_ = nullptr;
+    OdriTextService* service_ = nullptr;
 
     Microsoft::WRL::ComPtr<ITfContext> context_;
 
     CompositionEditOperation operation_;
+    char latin_;
 };
 
-} // namespace okkhor_windows
+} // namespace odri_windows
