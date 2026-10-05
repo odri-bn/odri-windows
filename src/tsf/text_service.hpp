@@ -4,6 +4,7 @@
 #include <windows.h>
 #include <string>
 #include <wrl/client.h>
+#include <vector>
 
 #include "core/engine_host.hpp"
 #include "tsf/edit_session.hpp"
@@ -95,7 +96,8 @@ namespace okkhor_windows
 
         HRESULT DoCompositionUpdate(
             ITfContext *context,
-            TfEditCookie edit_cookie);
+            TfEditCookie edit_cookie,
+            char latin);
 
         HRESULT DoCompositionEnd(
             ITfContext *context,
@@ -109,8 +111,8 @@ namespace okkhor_windows
             ITfContext *context,
             TfEditCookie edit_cookie);
 
-        HRESULT OkkhorTextService::EndComposition(
-            ITfContext *);
+        HRESULT EndComposition(
+            ITfContext *context);
 
     private:
         ~OkkhorTextService();
@@ -128,7 +130,8 @@ namespace okkhor_windows
         // ever pay for one RequestEditSession + one engine call per key.
         HRESULT RunEditSession(
             ITfContext *context,
-            CompositionEditOperation operation);
+            CompositionEditOperation operation,
+            char latin = '\0');
 
         // -------------------------------------------------------------------------
         // Okkhor state
@@ -167,6 +170,12 @@ namespace okkhor_windows
 
         // Current Bangla output from Okkhor.
         std::wstring composition_text_;
+
+        // Last committed Bangla text used for incremental TSF diffs.
+        std::wstring previous_text_;
+
+        // unit
+        std::vector<EngineUnit> previous_units_;
 
         // Context containing our committed Okkhor text.
         Microsoft::WRL::ComPtr<ITfContext> active_context_;

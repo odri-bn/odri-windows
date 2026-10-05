@@ -64,16 +64,23 @@ namespace okkhor_windows::log
             if (g_path.empty())
                 return;
 
-            FILE *file = nullptr;
-            if (::_wfopen_s(&file, g_path.c_str(), L"a, ccs=UTF-8") != 0 || !file)
-                return;
-
             SYSTEMTIME now{};
             ::GetLocalTime(&now);
-            std::fwprintf(file, L"%04u-%02u-%02u %02u:%02u:%02u.%03u [%5u] %S %S\n", now.wYear,
-                          now.wMonth, now.wDay, now.wHour, now.wMinute, now.wSecond, now.wMilliseconds,
-                          ::GetCurrentThreadId(), LevelName(level), message.c_str());
-            std::fclose(file);
+
+            char prefix[64] = {};
+            std::snprintf(prefix, sizeof(prefix), "%04u-%02u-%02u %02u:%02u:%02u.%03u [%5u] %s ",
+                          now.wYear, now.wMonth, now.wDay, now.wHour, now.wMinute, now.wSecond,
+                          now.wMilliseconds, ::GetCurrentThreadId(), LevelName(level));
+
+            std::string line = prefix + message + "\n";
+            HANDLE file = ::CreateFileW(g_path.c_str(), FILE_APPEND_DATA, FILE_SHARE_READ | FILE_SHARE_WRITE,
+                                        nullptr, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
+            if (file == INVALID_HANDLE_VALUE)
+                return;
+
+            DWORD written = 0;
+            ::WriteFile(file, line.data(), static_cast<DWORD>(line.size()), &written, nullptr);
+            ::CloseHandle(file);
 #endif
         }
 

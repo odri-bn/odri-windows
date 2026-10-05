@@ -29,10 +29,12 @@ namespace okkhor_windows
     CompositionEditSession::CompositionEditSession(
         OkkhorTextService *service,
         ITfContext *context,
-        CompositionEditOperation operation)
+        CompositionEditOperation operation,
+        char latin)
         : service_(service),
           context_(context),
-          operation_(operation)
+          operation_(operation),
+          latin_(latin)
     {
     }
 
@@ -83,9 +85,7 @@ namespace okkhor_windows
     {
         if (!service_ || !context_)
         {
-            OKKHOR_LOG_ERROR(
-                "CompositionEditSession missing service or context");
-
+            OKKHOR_LOG_ERROR("edit session missing service or context");
             return E_UNEXPECTED;
         }
 
@@ -98,18 +98,19 @@ namespace okkhor_windows
             hr =
                 service_->DoCompositionUpdate(
                     context_.Get(),
-                    edit_cookie);
+                    edit_cookie,
+                    latin_);
 
             break;
 
-        case CompositionEditOperation::Backspace:
+        // case CompositionEditOperation::Backspace:
 
-            hr =
-                service_->DoBackspace(
-                    context_.Get(),
-                    edit_cookie);
+        //     hr =
+        //         service_->DoBackspace(
+        //             context_.Get(),
+        //             edit_cookie);
 
-            break;
+        //     break;
 
         case CompositionEditOperation::End:
 
@@ -131,17 +132,14 @@ namespace okkhor_windows
 
         default:
 
-            OKKHOR_LOG_ERROR(
-                "CompositionEditSession unknown operation");
-
+            OKKHOR_LOG_ERROR("edit session unknown operation");
             return E_UNEXPECTED;
         }
 
         if (FAILED(hr))
         {
-            OKKHOR_LOG_ERROR(
-                "CompositionEditSession operation failed hr=" +
-                Hex(static_cast<unsigned long>(hr)));
+            OKKHOR_LOG_ERROR("edit session operation failed hr=" +
+                             Hex(static_cast<unsigned long>(hr)));
         }
 
         return hr;

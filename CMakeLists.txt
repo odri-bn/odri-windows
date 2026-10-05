@@ -9,7 +9,6 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # ==============================================================================
 # Options
 # ==============================================================================
-
 option(
     OKKHOR_WINDOWS_ENABLE_LOGGING
     "Write okkhor-windows.log"

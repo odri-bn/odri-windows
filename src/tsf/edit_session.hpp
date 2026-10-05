@@ -21,10 +21,11 @@ class CompositionEditSession
 {
 public:
 
-    CompositionEditSession(
-        OkkhorTextService* service,
-        ITfContext* context,
-        CompositionEditOperation operation);
+CompositionEditSession(
+    OkkhorTextService* service,
+    ITfContext* context,
+    CompositionEditOperation operation,
+    char latin);
 
     STDMETHODIMP QueryInterface(
         REFIID riid,
@@ -48,6 +49,7 @@ private:
     Microsoft::WRL::ComPtr<ITfContext> context_;
 
     CompositionEditOperation operation_;
+    char latin_;
 };
 
 } // namespace okkhor_windows
