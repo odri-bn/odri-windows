@@ -1,7 +1,7 @@
 // src/windows/module.cpp
 #include "windows/module.hpp"
 
-namespace okkhor_windows {
+namespace odri_windows {
 namespace {
 
 HMODULE g_module = nullptr;
@@ -39,4 +39,4 @@ void ModuleAddRef() { ::InterlockedIncrement(&g_ref_count); }
 void ModuleRelease() { ::InterlockedDecrement(&g_ref_count); }
 long ModuleRefCount() { return ::InterlockedCompareExchange(&g_ref_count, 0, 0); }
 
-}  // namespace okkhor_windows
+}  // namespace odri_windows

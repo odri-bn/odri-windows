@@ -107,7 +107,7 @@ namespace
             return false;
         }
 
-        // The Okkhor input buffer is currently byte-based.
+        // The Odri input buffer is currently byte-based.
         // Therefore only accept ASCII here.
         if (buffer[0] > 0x7F)
         {
@@ -127,7 +127,7 @@ namespace
 
     std::string WstringToString(const std::wstring &wstr)
     {
-        return okkhor_windows::WideToUtf8(wstr);
+        return odri_windows::WideToUtf8(wstr);
     }
 
     std::string QuoteString(const std::string &value)
@@ -246,7 +246,7 @@ namespace
 
 } // namespace
 
-namespace okkhor_windows
+namespace odri_windows
 {
 
     // =============================================================================
@@ -273,12 +273,12 @@ namespace okkhor_windows
     // =============================================================================
     // Construction / destruction
     // =============================================================================
-    OkkhorTextService::OkkhorTextService() : ref_count_(1)
+    OdriTextService::OdriTextService() : ref_count_(1)
     {
         ModuleAddRef();
     }
 
-    OkkhorTextService::~OkkhorTextService()
+    OdriTextService::~OdriTextService()
     {
         DetachThreadManager();
         ModuleRelease();
@@ -287,7 +287,7 @@ namespace okkhor_windows
     // =============================================================================
     // IUnknown
     // =============================================================================
-    STDMETHODIMP OkkhorTextService::QueryInterface(REFIID riid, void **ppv)
+    STDMETHODIMP OdriTextService::QueryInterface(REFIID riid, void **ppv)
     {
         if (!ppv)
         {
@@ -319,13 +319,13 @@ namespace okkhor_windows
     }
 
     STDMETHODIMP_(ULONG)
-    OkkhorTextService::AddRef()
+    OdriTextService::AddRef()
     {
         return static_cast<ULONG>(::InterlockedIncrement(&ref_count_));
     }
 
     STDMETHODIMP_(ULONG)
-    OkkhorTextService::Release()
+    OdriTextService::Release()
     {
         const LONG remaining = ::InterlockedDecrement(&ref_count_);
         if (remaining == 0)
@@ -338,29 +338,29 @@ namespace okkhor_windows
     // =============================================================================
     // ITfTextInputProcessor
     // =============================================================================
-    STDMETHODIMP OkkhorTextService::Activate(ITfThreadMgr *thread_mgr, TfClientId client_id)
+    STDMETHODIMP OdriTextService::Activate(ITfThreadMgr *thread_mgr, TfClientId client_id)
     {
         return ActivateEx(thread_mgr, client_id, 0);
     }
 
-    STDMETHODIMP OkkhorTextService::ActivateEx(ITfThreadMgr *thread_mgr, TfClientId client_id, DWORD flags)
+    STDMETHODIMP OdriTextService::ActivateEx(ITfThreadMgr *thread_mgr, TfClientId client_id, DWORD flags)
     {
         log::Initialize();
-        OKKHOR_LOG_INFO("tsf activation requested");
+        ODRI_LOG_INFO("tsf activation requested");
 
         const HRESULT hr = AttachThreadManager(thread_mgr, client_id, flags);
         if (FAILED(hr))
         {
-            OKKHOR_LOG_ERROR("tsf activation failed hr=" + Hex(static_cast<unsigned long>(hr)));
+            ODRI_LOG_ERROR("tsf activation failed hr=" + Hex(static_cast<unsigned long>(hr)));
             DetachThreadManager();
         }
 
         return hr;
     }
 
-    STDMETHODIMP OkkhorTextService::Deactivate()
+    STDMETHODIMP OdriTextService::Deactivate()
     {
-        OKKHOR_LOG_INFO("tsf deactivated");
+        ODRI_LOG_INFO("tsf deactivated");
         DetachThreadManager();
         return S_OK;
     }
@@ -368,7 +368,7 @@ namespace okkhor_windows
     // =============================================================================
     // TSF attachment
     // =============================================================================
-    HRESULT OkkhorTextService::AttachThreadManager(ITfThreadMgr *thread_mgr, TfClientId client_id, DWORD flags)
+    HRESULT OdriTextService::AttachThreadManager(ITfThreadMgr *thread_mgr, TfClientId client_id, DWORD flags)
     {
         if (!thread_mgr)
         {
@@ -379,58 +379,58 @@ namespace okkhor_windows
         client_id_ = client_id;
         activate_flags_ = flags;
 
-        OKKHOR_LOG_INFO("tsf attached client_id=" + std::to_string(client_id) + " flags=" + Hex(flags));
+        ODRI_LOG_INFO("tsf attached client_id=" + std::to_string(client_id) + " flags=" + Hex(flags));
 
         if (flags & TF_TMAE_SECUREMODE)
         {
-            OKKHOR_LOG_INFO("tsf secure desktop");
+            ODRI_LOG_INFO("tsf secure desktop");
         }
 
         HRESULT hr = thread_mgr_->QueryInterface(IID_PPV_ARGS(&keystroke_mgr_));
         if (FAILED(hr))
         {
-            OKKHOR_LOG_ERROR("failed to obtain ITfKeystrokeMgr hr=" + Hex(static_cast<unsigned long>(hr)));
+            ODRI_LOG_ERROR("failed to obtain ITfKeystrokeMgr hr=" + Hex(static_cast<unsigned long>(hr)));
             return hr;
         }
 
         hr = keystroke_mgr_->AdviseKeyEventSink(client_id_, static_cast<ITfKeyEventSink *>(this), TRUE);
         if (FAILED(hr))
         {
-            OKKHOR_LOG_ERROR("AdviseKeyEventSink failed hr=" + Hex(static_cast<unsigned long>(hr)));
+            ODRI_LOG_ERROR("AdviseKeyEventSink failed hr=" + Hex(static_cast<unsigned long>(hr)));
             keystroke_mgr_.Reset();
             return hr;
         }
 
-        OKKHOR_LOG_INFO("tsf key sink advised");
+        ODRI_LOG_INFO("tsf key sink advised");
         return S_OK;
     }
 
-    void OkkhorTextService::DetachThreadManager()
+    void OdriTextService::DetachThreadManager()
     {
         if (keystroke_mgr_)
         {
             keystroke_mgr_->UnadviseKeyEventSink(client_id_);
             keystroke_mgr_.Reset();
-            OKKHOR_LOG_INFO("tsf key sink removed");
+            ODRI_LOG_INFO("tsf key sink removed");
         }
 
-        ResetOkkhorState();
+        ResetOdriState();
         client_id_ = TF_CLIENTID_NULL;
         activate_flags_ = 0;
 
         if (thread_mgr_)
         {
             thread_mgr_.Reset();
-            OKKHOR_LOG_INFO("tsf thread manager detached");
+            ODRI_LOG_INFO("tsf thread manager detached");
         }
     }
 
     // =============================================================================
-    // Okkhor state
+    // Odri state
     // =============================================================================
-    void OkkhorTextService::ResetOkkhorState()
+    void OdriTextService::ResetOdriState()
     {
-        OKKHOR_LOG_INFO("tsf state reset");
+        ODRI_LOG_INFO("tsf state reset");
         latin_buffer_.clear();
         composition_text_.clear();
         previous_text_.clear();
@@ -442,12 +442,12 @@ namespace okkhor_windows
     // =============================================================================
     // Focus
     // =============================================================================
-    STDMETHODIMP OkkhorTextService::OnSetFocus(BOOL foreground)
+    STDMETHODIMP OdriTextService::OnSetFocus(BOOL foreground)
     {
-        OKKHOR_LOG_INFO("on_set_focus foreground=" + std::string(foreground ? "true" : "false"));
+        ODRI_LOG_INFO("on_set_focus foreground=" + std::string(foreground ? "true" : "false"));
         if (!foreground)
         {
-            ResetOkkhorState();
+            ResetOdriState();
         }
         return S_OK;
     }
@@ -455,7 +455,7 @@ namespace okkhor_windows
     // =============================================================================
     // Key testing
     // =============================================================================
-    STDMETHODIMP OkkhorTextService::OnTestKeyDown(ITfContext *context, WPARAM wParam, LPARAM lParam, BOOL *eaten)
+    STDMETHODIMP OdriTextService::OnTestKeyDown(ITfContext *context, WPARAM wParam, LPARAM lParam, BOOL *eaten)
     {
         (void)context;
         (void)lParam;
@@ -497,17 +497,17 @@ namespace okkhor_windows
         if (KeyboardKeyToLatin(wParam, lParam, &latin))
         {
             *eaten = TRUE;
-            OKKHOR_LOG_INFO("test key accepted: latin=" + std::string(1, latin) + " state=" + DescribeState(std::string(latin_buffer_.begin(), latin_buffer_.end()), previous_text_, composition_text_));
+            ODRI_LOG_INFO("test key accepted: latin=" + std::string(1, latin) + " state=" + DescribeState(std::string(latin_buffer_.begin(), latin_buffer_.end()), previous_text_, composition_text_));
         }
         else
         {
-            OKKHOR_LOG_INFO("test key ignored: no transliterable character");
+            ODRI_LOG_INFO("test key ignored: no transliterable character");
         }
 
         return S_OK;
     }
 
-    STDMETHODIMP OkkhorTextService::OnTestKeyUp(ITfContext *context, WPARAM wParam, LPARAM lParam, BOOL *eaten)
+    STDMETHODIMP OdriTextService::OnTestKeyUp(ITfContext *context, WPARAM wParam, LPARAM lParam, BOOL *eaten)
     {
         (void)context;
         (void)lParam;
@@ -516,14 +516,14 @@ namespace okkhor_windows
             return E_INVALIDARG;
         }
         *eaten = FALSE;
-        OKKHOR_LOG_INFO("test key up: state unchanged");
+        ODRI_LOG_INFO("test key up: state unchanged");
         return S_OK;
     }
 
     // =============================================================================
     // Key down
     // =============================================================================
-    STDMETHODIMP OkkhorTextService::OnKeyDown(ITfContext *context, WPARAM wParam, LPARAM lParam, BOOL *eaten)
+    STDMETHODIMP OdriTextService::OnKeyDown(ITfContext *context, WPARAM wParam, LPARAM lParam, BOOL *eaten)
     {
         if (!eaten)
         {
@@ -540,7 +540,7 @@ namespace okkhor_windows
             return E_INVALIDARG;
         }
 
-        OKKHOR_LOG_INFO("key down: evaluating edit state");
+        ODRI_LOG_INFO("key down: evaluating edit state");
 
         // =========================================================================
         // Backspace
@@ -549,7 +549,7 @@ namespace okkhor_windows
         {
             if (latin_buffer_.empty())
             {
-                OKKHOR_LOG_INFO("backspace: no pending latin, leaving app text alone");
+                ODRI_LOG_INFO("backspace: no pending latin, leaving app text alone");
                 *eaten = FALSE;
                 return S_OK;
             }
@@ -558,14 +558,14 @@ namespace okkhor_windows
             // forget our word, since the selection may cover or replace it.
             if (HasNonEmptySelection(context, client_id_))
             {
-                OKKHOR_LOG_INFO("backspace: selection is active, clearing Okkhor state");
-                ResetOkkhorState();
+                ODRI_LOG_INFO("backspace: selection is active, clearing Odri state");
+                ResetOdriState();
                 *eaten = FALSE;
                 return S_OK;
             }
 
             latin_buffer_.pop_back();
-            OKKHOR_LOG_INFO("backspace: latin buffer reduced to " + QuoteString(std::string(latin_buffer_.begin(), latin_buffer_.end())) +
+            ODRI_LOG_INFO("backspace: latin buffer reduced to " + QuoteString(std::string(latin_buffer_.begin(), latin_buffer_.end())) +
                             " state=" + DescribeState(std::string(latin_buffer_.begin(), latin_buffer_.end()), previous_text_, composition_text_));
 
             // We handled it. Never let the app also delete a character.
@@ -574,7 +574,7 @@ namespace okkhor_windows
             const HRESULT hr = RunEditSession(context, CompositionEditOperation::Update, '\0');
             if (FAILED(hr))
             {
-                OKKHOR_LOG_ERROR("backspace edit session failed hr=" + Hex(static_cast<unsigned long>(hr)));
+                ODRI_LOG_ERROR("backspace edit session failed hr=" + Hex(static_cast<unsigned long>(hr)));
             }
             return hr;
         }
@@ -584,8 +584,8 @@ namespace okkhor_windows
         // =========================================================================
         if (wParam == VK_SPACE || wParam == VK_RETURN)
         {
-            OKKHOR_LOG_INFO("space/enter closes the current Okkhor word; state reset");
-            ResetOkkhorState();
+            ODRI_LOG_INFO("space/enter closes the current Odri word; state reset");
+            ResetOdriState();
             *eaten = FALSE;
             return S_OK;
         }
@@ -595,8 +595,8 @@ namespace okkhor_windows
         // =========================================================================
         if (IsNavigationKey(wParam))
         {
-            OKKHOR_LOG_INFO("navigation key entered; dropping pending Okkhor state");
-            ResetOkkhorState();
+            ODRI_LOG_INFO("navigation key entered; dropping pending Odri state");
+            ResetOdriState();
             *eaten = FALSE;
             return S_OK;
         }
@@ -607,7 +607,7 @@ namespace okkhor_windows
         char latin = 0;
         if (!KeyboardKeyToLatin(wParam, lParam, &latin))
         {
-            OKKHOR_LOG_INFO("key ignored: not a transliterable character");
+            ODRI_LOG_INFO("key ignored: not a transliterable character");
             return S_OK;
         }
 
@@ -617,14 +617,14 @@ namespace okkhor_windows
         // -------------------------------------------------------------------------
         latin_buffer_.push_back(latin);
 
-        // Okkhor has claimed this key.
+        // Odri has claimed this key.
         // Never let Windows insert the original Latin character.
         *eaten = TRUE;
 
         const HRESULT hr = RunEditSession(context, CompositionEditOperation::Update, latin);
         if (FAILED(hr))
         {
-            OKKHOR_LOG_ERROR("update edit session failed hr=" + Hex(static_cast<unsigned long>(hr)) + " state=" + DescribeState(std::string(latin_buffer_.begin(), latin_buffer_.end()), previous_text_, composition_text_));
+            ODRI_LOG_ERROR("update edit session failed hr=" + Hex(static_cast<unsigned long>(hr)) + " state=" + DescribeState(std::string(latin_buffer_.begin(), latin_buffer_.end()), previous_text_, composition_text_));
         }
 
         return hr;
@@ -633,7 +633,7 @@ namespace okkhor_windows
     // =============================================================================
     // Key up
     // =============================================================================
-    STDMETHODIMP OkkhorTextService::OnKeyUp(ITfContext *context, WPARAM wParam, LPARAM lParam, BOOL *eaten)
+    STDMETHODIMP OdriTextService::OnKeyUp(ITfContext *context, WPARAM wParam, LPARAM lParam, BOOL *eaten)
     {
         (void)context;
         (void)lParam;
@@ -642,14 +642,14 @@ namespace okkhor_windows
             return E_INVALIDARG;
         }
         *eaten = FALSE;
-        OKKHOR_LOG_INFO("key up: state unchanged");
+        ODRI_LOG_INFO("key up: state unchanged");
         return S_OK;
     }
 
     // =============================================================================
     // Preserved key
     // =============================================================================
-    STDMETHODIMP OkkhorTextService::OnPreservedKey(ITfContext *context, REFGUID rguid, BOOL *eaten)
+    STDMETHODIMP OdriTextService::OnPreservedKey(ITfContext *context, REFGUID rguid, BOOL *eaten)
     {
         (void)context;
         if (!eaten)
@@ -657,14 +657,14 @@ namespace okkhor_windows
             return E_INVALIDARG;
         }
         *eaten = FALSE;
-        OKKHOR_LOG_INFO("preserved key: no state change");
+        ODRI_LOG_INFO("preserved key: no state change");
         return S_OK;
     }
 
     // =============================================================================
     // Check whether our owned range is still immediately before the caret
     // =============================================================================
-    bool OkkhorTextService::IsOwnedRangeAtSelection(ITfContext *context, TfEditCookie edit_cookie) const
+    bool OdriTextService::IsOwnedRangeAtSelection(ITfContext *context, TfEditCookie edit_cookie) const
     {
         if (!context || !owned_range_)
         {
@@ -711,7 +711,7 @@ namespace okkhor_windows
     // =============================================================================
     // Shared edit-session dispatch
     // =============================================================================
-    HRESULT OkkhorTextService::RunEditSession(ITfContext *context, CompositionEditOperation operation, char latin)
+    HRESULT OdriTextService::RunEditSession(ITfContext *context, CompositionEditOperation operation, char latin)
     {
         if (!context)
         {
@@ -802,7 +802,7 @@ namespace okkhor_windows
     // =============================================================================
     // Perform committed-range replacement
     // =============================================================================
-    HRESULT OkkhorTextService::DoCompositionUpdate(ITfContext *context, TfEditCookie edit_cookie, char latin)
+    HRESULT OdriTextService::DoCompositionUpdate(ITfContext *context, TfEditCookie edit_cookie, char latin)
     {
         static_cast<void>(latin);
 
@@ -814,13 +814,13 @@ namespace okkhor_windows
         std::vector<EngineUnit> current_units;
         if (!engine_.ConvertUnits(latin_buffer_, &current_units))
         {
-            OKKHOR_LOG_ERROR("tsf unit conversion failed");
+            ODRI_LOG_ERROR("tsf unit conversion failed");
             return E_FAIL;
         }
 
         if (current_units == previous_units_)
         {
-            OKKHOR_LOG_INFO("tsf update skipped: units unchanged");
+            ODRI_LOG_INFO("tsf update skipped: units unchanged");
             return S_OK;
         }
 
@@ -839,12 +839,12 @@ namespace okkhor_windows
         std::wstring bangla = Utf8ToWide(bangla_utf8);
         if (!bangla_utf8.empty() && bangla.empty())
         {
-            OKKHOR_LOG_ERROR("tsf utf-8 to utf-16 conversion failed");
+            ODRI_LOG_ERROR("tsf utf-8 to utf-16 conversion failed");
             return E_FAIL;
         }
         composition_text_ = std::move(bangla);
 
-        OKKHOR_LOG_INFO("tsf state " + DescribeState(std::string(latin_buffer_.begin(), latin_buffer_.end()), previous_text_, composition_text_));
+        ODRI_LOG_INFO("tsf state " + DescribeState(std::string(latin_buffer_.begin(), latin_buffer_.end()), previous_text_, composition_text_));
 
         // -------------------------------------------------------------------------
         // Empty output means delete our previously committed output.
@@ -864,7 +864,7 @@ namespace okkhor_windows
             previous_units_.clear();
             if (latin_buffer_.empty())
             {
-                ResetOkkhorState();
+                ResetOdriState();
             }
             else
             {
@@ -881,13 +881,13 @@ namespace okkhor_windows
         // -------------------------------------------------------------------------
         if (!owned_range_)
         {
-            OKKHOR_LOG_INFO("inserting first output" + (latin_buffer_.empty() ? "" : " latin_buffer=" + QuoteString(std::string(latin_buffer_.begin(), latin_buffer_.end()))));
+            ODRI_LOG_INFO("inserting first output" + (latin_buffer_.empty() ? "" : " latin_buffer=" + QuoteString(std::string(latin_buffer_.begin(), latin_buffer_.end()))));
             Microsoft::WRL::ComPtr<ITfInsertAtSelection> insert_at_selection;
 
             HRESULT hr = context->QueryInterface(IID_PPV_ARGS(&insert_at_selection));
             if (FAILED(hr))
             {
-                OKKHOR_LOG_ERROR("QueryInterface(ITfInsertAtSelection) failed, hr=" + Hex(static_cast<unsigned long>(hr)));
+                ODRI_LOG_ERROR("QueryInterface(ITfInsertAtSelection) failed, hr=" + Hex(static_cast<unsigned long>(hr)));
                 return hr;
             }
 
@@ -903,7 +903,7 @@ namespace okkhor_windows
 
             if (!inserted_range)
             {
-                OKKHOR_LOG_ERROR("InsertTextAtSelection returned NULL range");
+                ODRI_LOG_ERROR("InsertTextAtSelection returned NULL range");
                 return E_UNEXPECTED;
             }
 
@@ -913,7 +913,7 @@ namespace okkhor_windows
         else
         {
             // ---------------------------------------------------------------------
-            // Existing Okkhor range.
+            // Existing Odri range.
             //
             // Diff the final UTF-16 text (not the semantic units) and replace only
             // the region that actually changed. For "ক" -> "কি" this means the
@@ -924,11 +924,11 @@ namespace okkhor_windows
             const std::wstring old_changed = previous_text_.substr(diff.prefix, diff.old_changed);
             const std::wstring new_changed = composition_text_.substr(diff.prefix, diff.new_changed);
 
-            OKKHOR_LOG_INFO("tsf diff prefix=" + std::to_string(diff.prefix) +
+            ODRI_LOG_INFO("tsf diff prefix=" + std::to_string(diff.prefix) +
                             " suffix=" + std::to_string(diff.suffix) +
                             " replacement=" + DescribeReplacement(old_changed, new_changed));
 
-            // Clone the complete Okkhor range.
+            // Clone the complete Odri range.
             Microsoft::WRL::ComPtr<ITfRange> changed_range;
             HRESULT hr = owned_range_->Clone(changed_range.GetAddressOf());
             if (FAILED(hr))
@@ -937,7 +937,7 @@ namespace okkhor_windows
             }
             if (!changed_range)
             {
-                OKKHOR_LOG_ERROR("owned_range Clone returned NULL range");
+                ODRI_LOG_ERROR("owned_range Clone returned NULL range");
                 return E_UNEXPECTED;
             }
 
@@ -950,7 +950,7 @@ namespace okkhor_windows
             hr = changed_range->ShiftStart(edit_cookie, static_cast<LONG>(diff.prefix), &moved, nullptr);
             if (FAILED(hr))
             {
-                OKKHOR_LOG_ERROR("ShiftStart failed, hr=" + Hex(static_cast<unsigned long>(hr)));
+                ODRI_LOG_ERROR("ShiftStart failed, hr=" + Hex(static_cast<unsigned long>(hr)));
                 return hr;
             }
 
@@ -963,7 +963,7 @@ namespace okkhor_windows
             hr = changed_range->ShiftEnd(edit_cookie, -static_cast<LONG>(diff.suffix), &moved, nullptr);
             if (FAILED(hr))
             {
-                OKKHOR_LOG_ERROR("ShiftEnd failed, hr=" + Hex(static_cast<unsigned long>(hr)));
+                ODRI_LOG_ERROR("ShiftEnd failed, hr=" + Hex(static_cast<unsigned long>(hr)));
                 return hr;
             }
 
@@ -978,14 +978,14 @@ namespace okkhor_windows
             // The changed range may be empty (pure append) and replacement may be
             // empty (pure deletion).
             // ---------------------------------------------------------------------
-            OKKHOR_LOG_INFO("tsf replacement " + DescribeReplacement(
+            ODRI_LOG_INFO("tsf replacement " + DescribeReplacement(
                                 previous_text_.substr(diff.prefix, diff.old_changed),
                                 composition_text_.substr(diff.prefix, diff.new_changed)) +
                             " latin_buffer=" + QuoteString(std::string(latin_buffer_.begin(), latin_buffer_.end())));
             hr = changed_range->SetText(edit_cookie, 0, replacement.c_str(), static_cast<LONG>(replacement.size()));
             if (FAILED(hr))
             {
-                OKKHOR_LOG_ERROR("partial SetText failed, hr=" + Hex(static_cast<unsigned long>(hr)));
+                ODRI_LOG_ERROR("partial SetText failed, hr=" + Hex(static_cast<unsigned long>(hr)));
                 return hr;
             }
 
@@ -1000,7 +1000,7 @@ namespace okkhor_windows
             hr = owned_range_->ShiftEndToRange(edit_cookie, changed_range.Get(), TF_ANCHOR_END);
             if (FAILED(hr))
             {
-                OKKHOR_LOG_ERROR("ShiftEndToRange failed, hr=" + Hex(static_cast<unsigned long>(hr)));
+                ODRI_LOG_ERROR("ShiftEndToRange failed, hr=" + Hex(static_cast<unsigned long>(hr)));
                 return hr;
             }
 
@@ -1011,7 +1011,7 @@ namespace okkhor_windows
                 hr = owned_range_->ShiftStartToRange(edit_cookie, changed_range.Get(), TF_ANCHOR_START);
                 if (FAILED(hr))
                 {
-                    OKKHOR_LOG_ERROR("ShiftStartToRange failed, hr=" + Hex(static_cast<unsigned long>(hr)));
+                    ODRI_LOG_ERROR("ShiftStartToRange failed, hr=" + Hex(static_cast<unsigned long>(hr)));
                     return hr;
                 }
             }
@@ -1022,7 +1022,7 @@ namespace okkhor_windows
                 hr = owned_range_->ShiftEnd(edit_cookie, static_cast<LONG>(diff.suffix), &moved, nullptr);
                 if (FAILED(hr))
                 {
-                    OKKHOR_LOG_ERROR("ShiftEnd (suffix restore) failed, hr=" + Hex(static_cast<unsigned long>(hr)));
+                    ODRI_LOG_ERROR("ShiftEnd (suffix restore) failed, hr=" + Hex(static_cast<unsigned long>(hr)));
                     return hr;
                 }
             }
@@ -1049,7 +1049,7 @@ namespace okkhor_windows
 
         if (!caret_range)
         {
-            OKKHOR_LOG_ERROR("owned_range Clone returned NULL range");
+            ODRI_LOG_ERROR("owned_range Clone returned NULL range");
             return E_UNEXPECTED;
         }
 
@@ -1077,15 +1077,15 @@ namespace okkhor_windows
         }
 
         active_context_ = context;
-        OKKHOR_LOG_INFO("tsf composition update complete");
+        ODRI_LOG_INFO("tsf composition update complete");
 
         return S_OK;
     }
 
     // =============================================================================
-    // End current Okkhor word
+    // End current Odri word
     // =============================================================================
-    HRESULT OkkhorTextService::EndComposition(ITfContext *context)
+    HRESULT OdriTextService::EndComposition(ITfContext *context)
     {
         (void)context;
         //
@@ -1093,17 +1093,17 @@ namespace okkhor_windows
         //
         // The output is already ordinary committed text.
         //
-        OKKHOR_LOG_INFO("end composition: releasing owned range");
-        ResetOkkhorState();
+        ODRI_LOG_INFO("end composition: releasing owned range");
+        ResetOdriState();
         return S_OK;
     }
 
     // =============================================================================
     // Request end operation
     // =============================================================================
-    HRESULT OkkhorTextService::DoCompositionEnd(ITfContext *context, TfEditCookie edit_cookie)
+    HRESULT OdriTextService::DoCompositionEnd(ITfContext *context, TfEditCookie edit_cookie)
     {
-        OKKHOR_LOG_INFO("composition end cookie=" + Hex(static_cast<unsigned long>(edit_cookie)));
+        ODRI_LOG_INFO("composition end cookie=" + Hex(static_cast<unsigned long>(edit_cookie)));
         if (!context)
         {
             return E_INVALIDARG;
@@ -1113,8 +1113,8 @@ namespace okkhor_windows
         // Nothing needs to be committed because the text was already committed
         // on every key.
         //
-        ResetOkkhorState();
-        OKKHOR_LOG_INFO("composition state released");
+        ResetOdriState();
+        ODRI_LOG_INFO("composition state released");
 
         return S_OK;
     }
@@ -1122,7 +1122,7 @@ namespace okkhor_windows
     // =============================================================================
     // Backspace
     // =============================================================================
-    // HRESULT OkkhorTextService::DoBackspace(ITfContext *context, TfEditCookie edit_cookie)
+    // HRESULT OdriTextService::DoBackspace(ITfContext *context, TfEditCookie edit_cookie)
     // {
     //     if (!context)
     //     {
@@ -1135,7 +1135,7 @@ namespace okkhor_windows
     //         return DoCompositionUpdate(context, edit_cookie, latin_buffer_.empty() ? '\0' : latin_buffer_.back());
     //     }
 
-    //     ResetOkkhorState();
+    //     ResetOdriState();
     //     return DoDeleteSelection(context, edit_cookie);
     // }
 
@@ -1143,7 +1143,7 @@ namespace okkhor_windows
     // Delete current selection
     // (or, if collapsed, the character before it)
     // =============================================================================
-    HRESULT OkkhorTextService::DoDeleteSelection(ITfContext *context, TfEditCookie edit_cookie)
+    HRESULT OdriTextService::DoDeleteSelection(ITfContext *context, TfEditCookie edit_cookie)
     {
         if (!context)
         {
@@ -1216,8 +1216,8 @@ namespace okkhor_windows
             return hr;
         }
 
-        ResetOkkhorState();
+        ResetOdriState();
         return S_OK;
     }
 
-} // namespace okkhor_windows
+} // namespace odri_windows

@@ -14,7 +14,7 @@
 
 #include "windows/unicode.hpp"
 
-namespace okkhor_windows::log
+namespace odri_windows::log
 {
     namespace
     {
@@ -31,9 +31,9 @@ namespace okkhor_windows::log
             std::wstring dir(local_appdata);
             ::CoTaskMemFree(local_appdata);
 
-            dir += L"\\Okkhor";
+            dir += L"\\Odri";
             ::CreateDirectoryW(dir.c_str(), nullptr);
-            return dir + L"\\okkhor-windows.log";
+            return dir + L"\\odri-windows.log";
         }
 
         const char *LevelName(Level level)
@@ -54,7 +54,7 @@ namespace okkhor_windows::log
 
         void WriteLine(Level level, const std::string &message)
         {
-#ifndef OKKHOR_WINDOWS_LOGGING
+#ifndef ODRI_WINDOWS_LOGGING
             (void)level;
             (void)message;
 #else
@@ -114,4 +114,4 @@ namespace okkhor_windows::log
         WriteLine(Level::Debug, std::string(label) + ": " + utf8_text);
     }
 
-} // namespace okkhor_windows::log
+} // namespace odri_windows::log

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.21)
 
-project(okkhor-windows LANGUAGES CXX)
+project(odri-windows LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -10,19 +10,19 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Options
 # ==============================================================================
 option(
-    OKKHOR_WINDOWS_ENABLE_LOGGING
-    "Write okkhor-windows.log"
+    ODRI_WINDOWS_ENABLE_LOGGING
+    "Write odri-windows.log"
     OFF
 )
 
 option(
-    OKKHOR_WINDOWS_STATIC_RUNTIME
+    ODRI_WINDOWS_STATIC_RUNTIME
     "Link the MSVC runtime statically"
     ON
 )
 
 option(
-    OKKHOR_WINDOWS_BUILD_TESTS
+    ODRI_WINDOWS_BUILD_TESTS
     "Build platform-independent seam tests"
     OFF
 )
@@ -31,7 +31,7 @@ option(
 # MSVC Runtime
 # ==============================================================================
 
-if(MSVC AND OKKHOR_WINDOWS_STATIC_RUNTIME)
+if(MSVC AND ODRI_WINDOWS_STATIC_RUNTIME)
     set(
         CMAKE_MSVC_RUNTIME_LIBRARY
         "MultiThreaded$<$<CONFIG:Debug>:Debug>"
@@ -189,21 +189,21 @@ add_dependencies(
 # ==============================================================================
 
 add_library(
-    okkhor_seam
+    odri_seam
     STATIC
 
     src/core/engine_host.cpp
 )
 
 target_include_directories(
-    okkhor_seam
+    odri_seam
     PUBLIC
 
     "${CMAKE_CURRENT_SOURCE_DIR}/src"
 )
 
 target_link_libraries(
-    okkhor_seam
+    odri_seam
     PUBLIC
 
     odri
@@ -211,7 +211,7 @@ target_link_libraries(
 
 if(MSVC)
     target_compile_options(
-        okkhor_seam
+        odri_seam
         PRIVATE
 
         /W4
@@ -225,7 +225,7 @@ endif()
 if(WIN32)
 
     add_library(
-        okkhor_tsf
+        odri_tsf
         SHARED
 
         src/app/configuration.cpp
@@ -237,22 +237,22 @@ if(WIN32)
         src/windows/module.cpp
         src/windows/registration.cpp
         src/windows/unicode.cpp
-        src/windows/okkhor_tsf.def
-        src/resources/okkhor.rc
+        src/windows/odri_tsf.def
+        src/resources/odri.rc
     )
 
     set_target_properties(
-        okkhor_tsf
+        odri_tsf
         PROPERTIES
 
-        OUTPUT_NAME "okkhor_tsf"
+        OUTPUT_NAME "odri_tsf"
     )
 
     target_link_libraries(
-        okkhor_tsf
+        odri_tsf
         PRIVATE
 
-        okkhor_seam
+        odri_seam
 
         ole32
         oleaut32
@@ -263,7 +263,7 @@ if(WIN32)
     )
 
     target_compile_definitions(
-        okkhor_tsf
+        odri_tsf
         PRIVATE
 
         UNICODE
@@ -272,13 +272,13 @@ if(WIN32)
         WIN32_LEAN_AND_MEAN
     )
 
-    if(OKKHOR_WINDOWS_ENABLE_LOGGING)
+    if(ODRI_WINDOWS_ENABLE_LOGGING)
 
         target_compile_definitions(
-            okkhor_tsf
+            odri_tsf
             PRIVATE
 
-            OKKHOR_WINDOWS_LOGGING
+            ODRI_WINDOWS_LOGGING
         )
 
     endif()
@@ -286,7 +286,7 @@ if(WIN32)
     if(MSVC)
 
         target_compile_options(
-            okkhor_tsf
+            odri_tsf
             PRIVATE
 
             /W4
@@ -295,11 +295,11 @@ if(WIN32)
     endif()
 
     # --------------------------------------------------------------------------
-    # Copy Odri runtime DLL beside Okkhor TSF DLL
+    # Copy Odri runtime DLL beside Odri TSF DLL
     # --------------------------------------------------------------------------
 
     add_custom_command(
-        TARGET okkhor_tsf
+        TARGET odri_tsf
         POST_BUILD
 
         COMMAND
@@ -307,7 +307,7 @@ if(WIN32)
 
             "${ODRI_TARGET_DIR}/release/odri.dll"
 
-            "$<TARGET_FILE_DIR:okkhor_tsf>"
+            "$<TARGET_FILE_DIR:odri_tsf>"
     )
 
     # --------------------------------------------------------------------------
@@ -316,7 +316,7 @@ if(WIN32)
 
     install(
         TARGETS
-            okkhor_tsf
+            odri_tsf
 
         RUNTIME
             DESTINATION .
@@ -343,7 +343,7 @@ endif()
 # Tests
 # ==============================================================================
 
-if(OKKHOR_WINDOWS_BUILD_TESTS)
+if(ODRI_WINDOWS_BUILD_TESTS)
 
     enable_testing()
 
@@ -357,7 +357,7 @@ if(OKKHOR_WINDOWS_BUILD_TESTS)
         engine_host_tests
         PRIVATE
 
-        okkhor_seam
+        odri_seam
     )
 
     if(MSVC)

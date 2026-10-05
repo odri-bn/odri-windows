@@ -1,6 +1,6 @@
 # scripts/dev-build.ps1
 #
-# Okkhor development build cycle:
+# Odri development build cycle:
 #
 #   1. Detect processes that may hold the TSF DLL and offer to stop them
 #   2. Build the Debug configuration (skipped if -Dll is supplied)
@@ -12,7 +12,7 @@
 #
 # To skip the build and just (re)register an already-built DLL:
 #
-#   powershell -ExecutionPolicy Bypass -File scripts\dev-build.ps1 -Dll "build\Debug\okkhor_tsf.dll"
+#   powershell -ExecutionPolicy Bypass -File scripts\dev-build.ps1 -Dll "build\Debug\odri_tsf.dll"
 
 param(
     [string]$Dll
@@ -30,19 +30,19 @@ if ($Dll) {
     $dllPath = (Resolve-Path -LiteralPath $Dll -ErrorAction Stop).Path
 }
 else {
-    $dllPath = Join-Path $buildDir 'Debug\okkhor_tsf.dll'
+    $dllPath = Join-Path $buildDir 'Debug\odri_tsf.dll'
 }
 
 Write-Host ''
-Write-Host '=== Okkhor development build ===' -ForegroundColor Cyan
+Write-Host '=== Odri development build ===' -ForegroundColor Cyan
 Write-Host ''
 
 # ------------------------------------------------------------
 # Offer to stop processes that may hold the TSF DLL
 # ------------------------------------------------------------
-$processes = @(Get-OkkhorProcesses)
+$processes = @(Get-OdriProcesses)
 if ($processes.Count -gt 0) {
-    Write-Host '[1/3] Processes that may be using Okkhor:'
+    Write-Host '[1/3] Processes that may be using Odri:'
     Write-Host ''
     for ($i = 0; $i -lt $processes.Count; $i++) {
         Write-Host "  [$($i + 1)] $($processes[$i].Name) (PID $($processes[$i].Id))"
@@ -58,7 +58,7 @@ if ($processes.Count -gt 0) {
     $choice = Read-Host 'Choose'
 
     if ($choice -match '^[Aa]$') {
-        Stop-OkkhorProcesses
+        Stop-OdriProcesses
     }
     elseif ($choice -match '^[Nn]$') {
         Write-Host '      No processes stopped.'
@@ -116,13 +116,13 @@ else {
 Write-Host ''
 Write-Host '[3/3] Registering new TSF DLL...'
 Write-Host ''
-Unregister-OkkhorDll -DllPath $dllPath
-Register-OkkhorDll -DllPath $dllPath | Out-Null
+Unregister-OdriDll -DllPath $dllPath
+Register-OdriDll -DllPath $dllPath | Out-Null
 
 Write-Host ''
-Write-Host '=== Okkhor build completed successfully ===' -ForegroundColor Green
+Write-Host '=== Odri build completed successfully ===' -ForegroundColor Green
 Write-Host ''
 Write-Host "DLL: $dllPath"
 Write-Host ''
-Write-Host 'Switch to Okkhor Phonetic and test it.'
+Write-Host 'Switch to Odri Phonetic and test it.'
 Write-Host ''

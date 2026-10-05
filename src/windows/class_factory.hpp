@@ -1,17 +1,17 @@
 // src/windows/class_factory.hpp
 //
 // The IClassFactory that COM asks for when Windows wants to create an instance
-// of the Okkhor text service for a thread.
+// of the Odri text service for a thread.
 #pragma once
 
 #include <unknwn.h>
 #include <windows.h>
 
-namespace okkhor_windows {
+namespace odri_windows {
 
-class OkkhorClassFactory : public IClassFactory {
+class OdriClassFactory : public IClassFactory {
 public:
-    OkkhorClassFactory();
+    OdriClassFactory();
 
     STDMETHODIMP QueryInterface(REFIID riid, void** ppv) override;
     STDMETHODIMP_(ULONG) AddRef() override;
@@ -21,9 +21,9 @@ public:
     STDMETHODIMP LockServer(BOOL lock) override;
 
 private:
-    ~OkkhorClassFactory();
+    ~OdriClassFactory();
 
     LONG ref_count_;
 };
 
-}  // namespace okkhor_windows
+}  // namespace odri_windows

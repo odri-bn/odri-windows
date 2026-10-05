@@ -1,4 +1,4 @@
-; src/windows/okkhor_tsf.def
+; src/windows/odri_tsf.def
 ;
 ; The exports of an in-process COM server. Listing them in a module definition
 ; file keeps the names undecorated in both 32- and 64-bit builds.

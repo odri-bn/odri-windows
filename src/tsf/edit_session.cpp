@@ -5,7 +5,7 @@
 #include "tsf/text_service.hpp"
 #include "util/log.hpp"
 
-namespace okkhor_windows
+namespace odri_windows
 {
 
     namespace
@@ -27,7 +27,7 @@ namespace okkhor_windows
     } // namespace
 
     CompositionEditSession::CompositionEditSession(
-        OkkhorTextService *service,
+        OdriTextService *service,
         ITfContext *context,
         CompositionEditOperation operation,
         char latin)
@@ -85,7 +85,7 @@ namespace okkhor_windows
     {
         if (!service_ || !context_)
         {
-            OKKHOR_LOG_ERROR("edit session missing service or context");
+            ODRI_LOG_ERROR("edit session missing service or context");
             return E_UNEXPECTED;
         }
 
@@ -132,17 +132,17 @@ namespace okkhor_windows
 
         default:
 
-            OKKHOR_LOG_ERROR("edit session unknown operation");
+            ODRI_LOG_ERROR("edit session unknown operation");
             return E_UNEXPECTED;
         }
 
         if (FAILED(hr))
         {
-            OKKHOR_LOG_ERROR("edit session operation failed hr=" +
+            ODRI_LOG_ERROR("edit session operation failed hr=" +
                              Hex(static_cast<unsigned long>(hr)));
         }
 
         return hr;
     }
 
-} // namespace okkhor_windows
+} // namespace odri_windows

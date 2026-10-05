@@ -1,6 +1,6 @@
-; installer/okkhor.iss
+; installer/odri.iss
 ;
-; Inno Setup installer for Okkhor Windows TSF.
+; Inno Setup installer for Odri Windows TSF.
 
 ; ===========================================================================
 ; Application
@@ -10,21 +10,21 @@
 #define AppVersion "0.0.0"
 #endif
 
-#define AppName             "Okkhor"
+#define AppName             "Odri"
 #define AppVersionString    AppVersion
 #define AppPublisher        "Odrik"
 #define AppCopyright        "Copyright (C) 2026 H.M. Tajul Islam Tanim"
 #define AppPublisherURL     "https://github.com/odrik-bn"
-#define AppSupportURL       "https://github.com/odrik-bn/okkhor-windows"
-#define AppUpdatesURL       "https://github.com/odrik-bn/okkhor-windows"
+#define AppSupportURL       "https://github.com/odrik-bn/odri-windows"
+#define AppUpdatesURL       "https://github.com/odrik-bn/odri-windows"
 
 
 ; ===========================================================================
 ; Files
 ; ===========================================================================
 
-#define AppDllName          "okkhor_tsf.dll"
-#define AppIconName         "okkhor.ico"
+#define AppDllName          "odri_tsf.dll"
+#define AppIconName         "odri.ico"
 
 #define BuildDir            "..\build\Release"
 #define SourceDir           "..\src"
@@ -45,9 +45,9 @@
 ; Installer
 ; ===========================================================================
 
-#define InstallDir          "{autopf}\Okkhor"
+#define InstallDir          "{autopf}\Odri"
 #define OutputDir           "Output"
-#define OutputName          "OkkhorSetup-x64"
+#define OutputName          "OdriSetup-x64"
 
 
 ; ===========================================================================
@@ -110,8 +110,8 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Messages]
 
-WelcomeLabel1=Welcome to the Okkhor Setup Wizard
-WelcomeLabel2=This will install Okkhor, a Bangla input engine for Windows.%n%nCopyright (C) 2026 H.M. Tajul Islam Tanim.%nOkkhor is licensed under the GNU General Public License v3.0.
+WelcomeLabel1=Welcome to the Odri Setup Wizard
+WelcomeLabel2=This will install Odri, a Bangla input engine for Windows.%n%nCopyright (C) 2026 H.M. Tajul Islam Tanim.%nOdri is licensed under the GNU General Public License v3.0.
 
 
 ; ===========================================================================
@@ -120,7 +120,7 @@ WelcomeLabel2=This will install Okkhor, a Bangla input engine for Windows.%n%nCo
 
 [Files]
 
-; Okkhor Windows TSF
+; Odri Windows TSF
 Source: "{#DllSource}"; \
     DestDir: "{app}"; \
     Flags: ignoreversion

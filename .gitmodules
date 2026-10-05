@@ -1,6 +1,3 @@
-[submodule "external/okkhor-core"]
-	path = external/okkhor-core
-	url = https://github.com/okkhor-bn/okkhor-core.git
 [submodule "external/odri"]
 	path = external/odri
 	url = ../odri

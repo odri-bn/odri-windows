@@ -9,17 +9,17 @@
 #include "core/engine_host.hpp"
 #include "tsf/edit_session.hpp"
 
-namespace okkhor_windows
+namespace odri_windows
 {
 
     class CompositionEditSession;
 
-    class OkkhorTextService
+    class OdriTextService
         : public ITfTextInputProcessorEx,
           public ITfKeyEventSink
     {
     public:
-        OkkhorTextService();
+        OdriTextService();
 
         // -------------------------------------------------------------------------
         // IUnknown
@@ -115,7 +115,7 @@ namespace okkhor_windows
             ITfContext *context);
 
     private:
-        ~OkkhorTextService();
+        ~OdriTextService();
 
         HRESULT AttachThreadManager(
             ITfThreadMgr *thread_mgr,
@@ -134,10 +134,10 @@ namespace okkhor_windows
             char latin = '\0');
 
         // -------------------------------------------------------------------------
-        // Okkhor state
+        // Odri state
         // -------------------------------------------------------------------------
 
-        void ResetOkkhorState();
+        void ResetOdriState();
 
         bool IsOwnedRangeAtSelection(
             ITfContext *context,
@@ -156,19 +156,19 @@ namespace okkhor_windows
         DWORD activate_flags_ = 0;
 
         // -------------------------------------------------------------------------
-        // Okkhor core
+        // Odri core
         // -------------------------------------------------------------------------
 
         EngineHost engine_;
 
         // -------------------------------------------------------------------------
-        // Current Okkhor state
+        // Current Odri state
         // -------------------------------------------------------------------------
 
         // The Latin input that produced the current Bangla output.
         std::string latin_buffer_;
 
-        // Current Bangla output from Okkhor.
+        // Current Bangla output from Odri.
         std::wstring composition_text_;
 
         // Last committed Bangla text used for incremental TSF diffs.
@@ -177,10 +177,10 @@ namespace okkhor_windows
         // unit
         std::vector<EngineUnit> previous_units_;
 
-        // Context containing our committed Okkhor text.
+        // Context containing our committed Odri text.
         Microsoft::WRL::ComPtr<ITfContext> active_context_;
 
-        // Range containing the committed Bangla text currently owned by Okkhor.
+        // Range containing the committed Bangla text currently owned by Odri.
         //
         // Unlike ITfComposition, this is ordinary committed document text.
         // There is therefore no TSF composition underline.
@@ -189,4 +189,4 @@ namespace okkhor_windows
         friend class CompositionEditSession;
     };
 
-} // namespace okkhor_windows
+} // namespace odri_windows

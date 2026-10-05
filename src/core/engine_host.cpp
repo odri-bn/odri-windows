@@ -2,7 +2,7 @@
 
 #include <utility>
 
-namespace okkhor_windows
+namespace odri_windows
 {
 
 EngineHost::EngineHost()
@@ -116,4 +116,4 @@ bool EngineHost::ConvertUnits(
     return true;
 }
 
-} // namespace okkhor_windows
+} // namespace odri_windows

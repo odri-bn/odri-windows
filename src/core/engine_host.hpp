@@ -6,7 +6,7 @@
 #include <string_view>
 #include <vector>
 
-namespace okkhor_windows
+namespace odri_windows
 {
 
     struct EngineUnit
@@ -45,4 +45,4 @@ namespace okkhor_windows
         OdriEngine *engine_ = nullptr;
     };
 
-} // namespace okkhor_windows
+} // namespace odri_windows

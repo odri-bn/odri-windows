@@ -14,7 +14,7 @@
 #include "windows/module.hpp"
 #include "windows/registration.hpp"
 
-using namespace okkhor_windows;
+using namespace odri_windows;
 
 BOOL APIENTRY DllMain(HMODULE module, DWORD reason, LPVOID /*reserved*/) {
     switch (reason) {
@@ -37,9 +37,9 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, void** ppv) {
     if (!ppv) return E_INVALIDARG;
     *ppv = nullptr;
 
-    if (!IsEqualCLSID(rclsid, kOkkhorTextServiceClsid)) return CLASS_E_CLASSNOTAVAILABLE;
+    if (!IsEqualCLSID(rclsid, kOdriTextServiceClsid)) return CLASS_E_CLASSNOTAVAILABLE;
 
-    auto* factory = new (std::nothrow) OkkhorClassFactory();
+    auto* factory = new (std::nothrow) OdriClassFactory();
     if (!factory) return E_OUTOFMEMORY;
 
     const HRESULT hr = factory->QueryInterface(riid, ppv);
@@ -50,7 +50,7 @@ STDAPI DllGetClassObject(REFCLSID rclsid, REFIID riid, void** ppv) {
 // COM may unload us once nothing is alive and nothing holds a server lock.
 STDAPI DllCanUnloadNow() { return ModuleRefCount() == 0 ? S_OK : S_FALSE; }
 
-// regsvr32 okkhor_tsf.dll   (elevated)
+// regsvr32 odri_tsf.dll   (elevated)
 STDAPI DllRegisterServer() {
     HRESULT hr = RegisterComServer();
     if (SUCCEEDED(hr)) hr = RegisterProfile();
@@ -65,7 +65,7 @@ STDAPI DllRegisterServer() {
     return hr;
 }
 
-// regsvr32 /u okkhor_tsf.dll   (elevated)
+// regsvr32 /u odri_tsf.dll   (elevated)
 STDAPI DllUnregisterServer() {
     // Unregister in reverse order and keep going even if a step is already
     // undone, so a partially installed service can still be cleaned up.

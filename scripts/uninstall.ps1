@@ -1,11 +1,11 @@
 # scripts/uninstall.ps1
 #
-# Unregisters the Okkhor TSF DLL. Intended to run as an Inno Setup
+# Unregisters the Odri TSF DLL. Intended to run as an Inno Setup
 # pre-uninstall [UninstallRun] step, before Setup removes the files:
 #
 #   [UninstallRun]
 #   Filename: "powershell.exe"; \
-#     Parameters: "-NoProfile -ExecutionPolicy Bypass -File ""{app}\scripts\uninstall.ps1"" -Dll ""{app}\okkhor_tsf.dll"""; \
+#     Parameters: "-NoProfile -ExecutionPolicy Bypass -File ""{app}\scripts\uninstall.ps1"" -Dll ""{app}\odri_tsf.dll"""; \
 #     Flags: runhidden waituntilterminated
 #
 # This script only stops processes and unregisters the DLL. It does NOT
@@ -26,18 +26,18 @@ $ErrorActionPreference = 'Stop'
 Assert-Administrator
 
 if ([string]::IsNullOrWhiteSpace($Dll)) {
-    $dllPath = Join-Path $OkkhorInstallDir $OkkhorDllName
+    $dllPath = Join-Path $OdriInstallDir $OdriDllName
 }
 else {
     $dllPath = (Resolve-Path -LiteralPath $Dll -ErrorAction Stop).Path
 }
 
 Write-Step 'Stopping Windows components...'
-Stop-OkkhorProcesses
+Stop-OdriProcesses
 
-Write-Step 'Unregistering Okkhor...'
-Unregister-OkkhorDll -DllPath $dllPath
+Write-Step 'Unregistering Odri...'
+Unregister-OdriDll -DllPath $dllPath
 
 Write-Host ''
-Write-Host '=== Okkhor unregistered ===' -ForegroundColor Green
+Write-Host '=== Odri unregistered ===' -ForegroundColor Green
 Write-Host ''

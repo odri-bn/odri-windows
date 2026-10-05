@@ -1,16 +1,16 @@
 # scripts/register.ps1
 #
-# Registers the Okkhor TSF DLL with Windows. Intended to run as an Inno
+# Registers the Odri TSF DLL with Windows. Intended to run as an Inno
 # Setup post-install [Run] step, right after Setup has copied the files:
 #
 #   [Run]
 #   Filename: "powershell.exe"; \
-#     Parameters: "-NoProfile -ExecutionPolicy Bypass -File ""{app}\scripts\register.ps1"" -Dll ""{app}\okkhor_tsf.dll"""; \
+#     Parameters: "-NoProfile -ExecutionPolicy Bypass -File ""{app}\scripts\register.ps1"" -Dll ""{app}\odri_tsf.dll"""; \
 #     Flags: runhidden waituntilterminated
 #
 # Also usable directly, e.g. by dev-build.ps1:
 #
-#   powershell -ExecutionPolicy Bypass -File scripts\register.ps1 -Dll "build\Debug\okkhor_tsf.dll"
+#   powershell -ExecutionPolicy Bypass -File scripts\register.ps1 -Dll "build\Debug\odri_tsf.dll"
 #
 # common.ps1 must ship next to this file (Inno needs to package it into
 # {app}\scripts, not just register.ps1/uninstall.ps1) since both scripts
@@ -26,20 +26,20 @@ $ErrorActionPreference = 'Stop'
 Assert-Administrator
 
 if ([string]::IsNullOrWhiteSpace($Dll)) {
-    $dllPath = Join-Path $OkkhorInstallDir $OkkhorDllName
+    $dllPath = Join-Path $OdriInstallDir $OdriDllName
 }
 else {
     $dllPath = (Resolve-Path -LiteralPath $Dll -ErrorAction Stop).Path
 }
 
 Write-Step 'Stopping Windows components...'
-Stop-OkkhorProcesses
+Stop-OdriProcesses
 
-Write-Step 'Removing previous Okkhor registration...'
+Write-Step 'Removing previous Odri registration...'
 # Unregister first so upgrades (same path, new file) re-register cleanly.
 # Ignored if nothing was registered yet - this may be a first install.
-Unregister-OkkhorDll -DllPath $dllPath
-Write-Step 'Registering Okkhor...'
-$exitCode = Register-OkkhorDll -DllPath $dllPath
+Unregister-OdriDll -DllPath $dllPath
+Write-Step 'Registering Odri...'
+$exitCode = Register-OdriDll -DllPath $dllPath
 
 exit $exitCode
